@@ -112,8 +112,13 @@ After calling this method, 'line' events gets emitted again.
 Stops emitting 'line' events, closes the file and emits the 'end' event.
 
 
+## Known bugs:
+
+If the last line of a file is empty, it won't get emitted.
+
+
 ## License:
 
 The MIT License (MIT)
 
-Copyright © 2012 Markus von der Wehd
+Copyright Â© 2012 Markus von der Wehd
