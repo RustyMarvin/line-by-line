@@ -21,6 +21,7 @@ var LineByLineReader = function (filepath, options) {
 
 	this._readStream = null;
 	this._lines = [];
+	this._lineFragment = '';
 	this._paused = false;
 	this._end = false;
 
@@ -50,6 +51,9 @@ LineByLineReader.prototype._initStream = function () {
 		self._readStream.pause();
 		self._lines = self._lines.concat(data.split(/(?:\n|\r\n|\r)/g));
 
+		self._lines[0] = self._lineFragment + self._lines[0];
+		self._lineFragment = self._lines.pop() || '';
+
 		process.nextTick(function () {
 			self._nextLine();
 		});
@@ -70,6 +74,18 @@ LineByLineReader.prototype._nextLine = function () {
 	var self = this,
 		line;
 
+	if (this._end && !!this._lineFragment) {
+		this.emit('line', this._lineFragment);
+		this._lineFragment = '';
+
+		if (!this._paused) {
+			process.nextTick(function () {
+				self.emit('end');
+			});
+		}
+		return;
+	}
+
 	if (this._end) {
 		this.emit('end');
 		return;
@@ -87,7 +103,7 @@ LineByLineReader.prototype._nextLine = function () {
 	line = this._lines.shift();
 
 	if (!this._skipEmptyLines || line.length > 0) {
-		self.emit('line', line);
+		this.emit('line', line);
 	}
 
 	if (!this._paused) {
