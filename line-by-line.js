@@ -50,7 +50,7 @@ LineByLineReader.prototype._initStream = function () {
 	});
 
 	readStream.on('data', function (data) {
-		if (self._iconvDecode)
+		if (self._iconvDecode) {
 			data = iconv.decode(data, self._iconvDecode);
 		}
 		
