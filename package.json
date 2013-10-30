@@ -10,7 +10,9 @@
     "url": "git@github.com:RustyMarvin/line-by-line.git"
   },
   "main": "line-by-line.js",
-  "dependencies": { },
+  "dependencies": {
+    "iconv-lite": ">=0.2.11"
+  },
   "devDependencies": {
     "nodeunit": "latest"
   },
