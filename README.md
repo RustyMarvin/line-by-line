@@ -64,8 +64,9 @@ Asynchronous processing of lines:
 
 `options` is an object with the following defaults:
 ```
-{ encoding: 'utf8',
-  skipEmptyLines: false }
+{ encoding: undefined,
+  skipEmptyLines: false
+  iconvDecode: undefined }
 ```
 
 `encoding` can be `'utf8'`, `'ascii'`, or `'base64'`.
