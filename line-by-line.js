@@ -11,13 +11,15 @@
 var path = require('path');
 var fs = require('fs');
 var events = require("events");
+var iconv = require("iconv-lite");
 
 var LineByLineReader = function (filepath, options) {
 	var self = this;
 
 	this._filepath = path.normalize(filepath);
-	this._encoding = options && options.encoding || 'utf8';
+	this._encoding = options && options.encoding;
 	this._skipEmptyLines = options && options.skipEmptyLines || false;
+	this._iconvDecode = options && options.iconvDecode;
 
 	this._readStream = null;
 	this._lines = [];
@@ -48,6 +50,10 @@ LineByLineReader.prototype._initStream = function () {
 	});
 
 	readStream.on('data', function (data) {
+		if (self._iconvDecode) {
+			data = iconv.decode(data, self._iconvDecode);
+		}
+		
 		self._readStream.pause();
 		self._lines = self._lines.concat(data.split(/(?:\n|\r\n|\r)/g));
 

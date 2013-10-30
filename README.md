@@ -1,4 +1,3 @@
-
 # Line By Line
 
 is a [NodeJS](http://nodejs.org/) module
@@ -15,7 +14,9 @@ Installation:
 Synchronous processing of lines:
 
 	var LineByLineReader = require('line-by-line'),
-	var lr = new LineByLineReader('big_file.txt');
+	var lr = new LineByLineReader('big_file.txt', {
+		iconvDecode: 'cp866' // iconv will decode each line
+	});
 
 	lr.on('error', function (err) {
 		// 'err' contains error object
@@ -63,8 +64,9 @@ Asynchronous processing of lines:
 
 `options` is an object with the following defaults:
 ```
-{ encoding: 'utf8',
-  skipEmptyLines: false }
+{ encoding: undefined,
+  skipEmptyLines: false
+  iconvDecode: undefined }
 ```
 
 `encoding` can be `'utf8'`, `'ascii'`, or `'base64'`.
