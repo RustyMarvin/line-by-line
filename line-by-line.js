@@ -12,6 +12,9 @@ var path = require('path');
 var fs = require('fs');
 var events = require("events");
 
+// let's make sure we have a setImmediate function (node.js <0.10)
+if (typeof setImmediate == 'undefined') { var setImmediate = process.nextTick; }
+
 var LineByLineReader = function (filepath, options) {
 	var self = this;
 
@@ -27,7 +30,7 @@ var LineByLineReader = function (filepath, options) {
 
 	events.EventEmitter.call(this);
 
-	process.nextTick(function () {
+	setImmediate(function () {
 		self._initStream();
 	});
 };
@@ -54,7 +57,7 @@ LineByLineReader.prototype._initStream = function () {
 		self._lines[0] = self._lineFragment + self._lines[0];
 		self._lineFragment = self._lines.pop() || '';
 
-		process.nextTick(function () {
+		setImmediate(function () {
 			self._nextLine();
 		});
 	});
@@ -62,7 +65,7 @@ LineByLineReader.prototype._initStream = function () {
 	readStream.on('end', function () {
 		self._end = true;
 
-		process.nextTick(function () {
+		setImmediate(function () {
 			self._nextLine();
 		});
 	});
@@ -79,24 +82,28 @@ LineByLineReader.prototype._nextLine = function () {
 		this._lineFragment = '';
 
 		if (!this._paused) {
-			process.nextTick(function () {
+			setImmediate(function () {
 				self.emit('end');
 			});
 		}
 		return;
 	}
-
-	if (this._end) {
-		this.emit('end');
-		return;
-	}
-
+	/*
+	 if (this._end) {
+	 this.emit('end');
+	 return;
+	 }
+	 */
 	if (this._paused) {
 		return;
 	}
 
 	if (this._lines.length === 0) {
-		this._readStream.resume();
+		if (this._end) {
+			this.emit('end');
+		} else {
+			this._readStream.resume();
+		}
 		return;
 	}
 
@@ -107,7 +114,7 @@ LineByLineReader.prototype._nextLine = function () {
 	}
 
 	if (!this._paused) {
-		process.nextTick(function () {
+		setImmediate(function () {
 			self._nextLine();
 		});
 	}
@@ -122,7 +129,7 @@ LineByLineReader.prototype.resume = function () {
 
 	this._paused = false;
 
-	process.nextTick(function () {
+	setImmediate(function () {
 		self._nextLine();
 	});
 };
@@ -133,7 +140,7 @@ LineByLineReader.prototype.close = function () {
 	this._readStream.destroy();
 	this._end = true;
 
-	process.nextTick(function () {
+	setImmediate(function () {
 		self._nextLine();
 	});
 };
