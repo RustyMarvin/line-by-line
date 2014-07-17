@@ -14,7 +14,7 @@ Installation:
 
 Synchronous processing of lines:
 
-	var LineByLineReader = require('line-by-line'),
+	var LineByLineReader = require('line-by-line');
 	var lr = new LineByLineReader('big_file.txt');
 
 	lr.on('error', function (err) {
