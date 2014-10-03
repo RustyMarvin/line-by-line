@@ -12,9 +12,6 @@ var path = require('path');
 var fs = require('fs');
 var events = require("events");
 
-// let's make sure we have a setImmediate function (node.js <0.10)
-if (typeof setImmediate == 'undefined') { var setImmediate = process.nextTick; }
-
 var LineByLineReader = function (filepath, options) {
 	var self = this;
 
@@ -30,7 +27,7 @@ var LineByLineReader = function (filepath, options) {
 
 	events.EventEmitter.call(this);
 
-	setImmediate(function () {
+	process.nextTick(function () {
 		self._initStream();
 	});
 };
@@ -57,7 +54,7 @@ LineByLineReader.prototype._initStream = function () {
 		self._lines[0] = self._lineFragment + self._lines[0];
 		self._lineFragment = self._lines.pop() || '';
 
-		setImmediate(function () {
+		process.nextTick(function () {
 			self._nextLine();
 		});
 	});
@@ -65,7 +62,7 @@ LineByLineReader.prototype._initStream = function () {
 	readStream.on('end', function () {
 		self._end = true;
 
-		setImmediate(function () {
+		process.nextTick(function () {
 			self._nextLine();
 		});
 	});
@@ -77,23 +74,18 @@ LineByLineReader.prototype._nextLine = function () {
 	var self = this,
 		line;
 
-	if (this._end && !!this._lineFragment) {
+	if (this._end && this._lineFragment) {
 		this.emit('line', this._lineFragment);
 		this._lineFragment = '';
 
 		if (!this._paused) {
-			setImmediate(function () {
+			process.nextTick(function () {
 				self.emit('end');
 			});
 		}
 		return;
 	}
-	/*
-	 if (this._end) {
-	 this.emit('end');
-	 return;
-	 }
-	 */
+
 	if (this._paused) {
 		return;
 	}
@@ -114,7 +106,7 @@ LineByLineReader.prototype._nextLine = function () {
 	}
 
 	if (!this._paused) {
-		setImmediate(function () {
+		process.nextTick(function () {
 			self._nextLine();
 		});
 	}
@@ -129,7 +121,7 @@ LineByLineReader.prototype.resume = function () {
 
 	this._paused = false;
 
-	setImmediate(function () {
+	process.nextTick(function () {
 		self._nextLine();
 	});
 };
@@ -140,7 +132,7 @@ LineByLineReader.prototype.close = function () {
 	this._readStream.destroy();
 	this._end = true;
 
-	setImmediate(function () {
+	process.nextTick(function () {
 		self._nextLine();
 	});
 };
