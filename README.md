@@ -15,7 +15,7 @@ Installation:
 Synchronous processing of lines:
 
 	var LineByLineReader = require('line-by-line'),
-	var lr = new LineByLineReader('big_file.txt');
+	    lr = new LineByLineReader('big_file.txt');
 
 	lr.on('error', function (err) {
 		// 'err' contains error object
@@ -32,7 +32,7 @@ Synchronous processing of lines:
 Asynchronous processing of lines:
 
 	var LineByLineReader = require('line-by-line'),
-	var lr = new LineByLineReader('big_file.txt');
+	    lr = new LineByLineReader('big_file.txt');
 
 	lr.on('error', function (err) {
 		// 'err' contains error object
