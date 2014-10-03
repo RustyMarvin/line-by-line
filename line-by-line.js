@@ -12,6 +12,9 @@ var path = require('path');
 var fs = require('fs');
 var events = require("events");
 
+// let's make sure we have a setImmediate function (node.js <0.10)
+if (typeof global.setImmediate == 'undefined') { setImmediate = process.nextTick;}
+
 var LineByLineReader = function (filepath, options) {
 	var self = this;
 
@@ -24,10 +27,11 @@ var LineByLineReader = function (filepath, options) {
 	this._lineFragment = '';
 	this._paused = false;
 	this._end = false;
+	this._ended = false;
 
 	events.EventEmitter.call(this);
 
-	process.nextTick(function () {
+	setImmediate(function () {
 		self._initStream();
 	});
 };
@@ -54,7 +58,7 @@ LineByLineReader.prototype._initStream = function () {
 		self._lines[0] = self._lineFragment + self._lines[0];
 		self._lineFragment = self._lines.pop() || '';
 
-		process.nextTick(function () {
+		setImmediate(function () {
 			self._nextLine();
 		});
 	});
@@ -62,7 +66,7 @@ LineByLineReader.prototype._initStream = function () {
 	readStream.on('end', function () {
 		self._end = true;
 
-		process.nextTick(function () {
+		setImmediate(function () {
 			self._nextLine();
 		});
 	});
@@ -79,8 +83,8 @@ LineByLineReader.prototype._nextLine = function () {
 		this._lineFragment = '';
 
 		if (!this._paused) {
-			process.nextTick(function () {
-				self.emit('end');
+			setImmediate(function () {
+				self.end();
 			});
 		}
 		return;
@@ -92,7 +96,7 @@ LineByLineReader.prototype._nextLine = function () {
 
 	if (this._lines.length === 0) {
 		if (this._end) {
-			this.emit('end');
+			this.end();
 		} else {
 			this._readStream.resume();
 		}
@@ -106,7 +110,7 @@ LineByLineReader.prototype._nextLine = function () {
 	}
 
 	if (!this._paused) {
-		process.nextTick(function () {
+		setImmediate(function () {
 			self._nextLine();
 		});
 	}
@@ -121,10 +125,17 @@ LineByLineReader.prototype.resume = function () {
 
 	this._paused = false;
 
-	process.nextTick(function () {
+	setImmediate(function () {
 		self._nextLine();
 	});
 };
+
+LineByLineReader.prototype.end = function () {
+	if (!this._ended){
+		this._ended = true;
+		this.emit('end');
+	}
+}
 
 LineByLineReader.prototype.close = function () {
 	var self = this;
@@ -132,7 +143,7 @@ LineByLineReader.prototype.close = function () {
 	this._readStream.destroy();
 	this._end = true;
 
-	process.nextTick(function () {
+	setImmediate(function () {
 		self._nextLine();
 	});
 };
