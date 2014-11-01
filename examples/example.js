@@ -11,5 +11,5 @@ lr.on('line', function (line) {
 });
 
 lr.on('end', function () {
-	console.log("Ok we're done - exiting now.")
+	console.log("Ok we're done - exiting now.");
 });

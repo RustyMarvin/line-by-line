@@ -135,7 +135,7 @@ LineByLineReader.prototype.end = function () {
 		this._ended = true;
 		this.emit('end');
 	}
-}
+};
 
 LineByLineReader.prototype.close = function () {
 	var self = this;
