@@ -1,6 +1,7 @@
+[![Build Status](https://travis-ci.org/Osterjour/line-by-line.svg?branch=master)](https://travis-ci.org/Osterjour/line-by-line)
+[![npm version](https://badge.fury.io/js/line-by-line.svg)](http://badge.fury.io/js/line-by-line)
 
 # Line By Line
-
 is a [NodeJS](http://nodejs.org/) module
 that helps you reading large text files, line by line,
 without buffering the files into memory.
