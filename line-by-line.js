@@ -51,6 +51,10 @@ LineByLineReader.prototype._initStream = function () {
 		self.emit('error', err);
 	});
 
+	readStream.on('open', function () {
+		self.emit('open');
+	});
+
 	readStream.on('data', function (data) {
 		self._readStream.pause();
 		self._lines = self._lines.concat(data.split(/(?:\n|\r\n|\r)/g));
