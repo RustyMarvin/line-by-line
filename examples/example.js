@@ -6,6 +6,10 @@ lr.on('error', function (err) {
 	throw err;
 });
 
+lr.on('open', function() {
+	// Do something, like initialise progress bar etc.
+});
+
 lr.on('line', function (line) {
 	console.log(++row + ": " + line);
 });
