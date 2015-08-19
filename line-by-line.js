@@ -21,6 +21,15 @@ var LineByLineReader = function (filepath, options) {
 	this._filepath = path.normalize(filepath);
 	this._encoding = options && options.encoding || 'utf8';
 	this._skipEmptyLines = options && options.skipEmptyLines || false;
+	this._streamOptions = { encoding: this._encoding };
+
+	if (options && options.start) {
+		this._streamOptions.start = options.start;
+	}
+
+	if (options && options.end) {
+		this._streamOptions.end = options.end;
+	}
 
 	this._readStream = null;
 	this._lines = [];
@@ -45,7 +54,7 @@ LineByLineReader.prototype = Object.create(events.EventEmitter.prototype, {
 
 LineByLineReader.prototype._initStream = function () {
 	var self = this,
-		readStream = fs.createReadStream(this._filepath, { encoding: this._encoding });
+		readStream = fs.createReadStream(this._filepath, this._streamOptions);
 
 	readStream.on('error', function (err) {
 		self.emit('error', err);
