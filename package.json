@@ -3,7 +3,7 @@
 	"contributors": ["Markus von der Wehd <mvdw@mwin.de>"],
 	"name": "line-by-line",
 	"description": "A NodeJS module that helps you reading large text files, line by line, without buffering the files into memory.",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"keywords": [ "line", "file", "reader", "fs" ],
 	"homepage": "https://github.com/Osterjour/line-by-line",
 	"repository": {
