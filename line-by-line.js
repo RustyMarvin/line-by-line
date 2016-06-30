@@ -91,24 +91,16 @@ LineByLineReader.prototype._nextLine = function () {
 	var self = this,
 		line;
 
-	if (this._end && this._lineFragment) {
-		this.emit('line', this._lineFragment);
-		this._lineFragment = '';
-
-		if (!this._paused) {
-			setImmediate(function () {
-				self.end();
-			});
-		}
-		return;
-	}
-
 	if (this._paused) {
 		return;
 	}
 
 	if (this._lines.length === 0) {
 		if (this._end) {
+			if (this._lineFragment) {
+				this.emit('line', this._lineFragment);
+				this._lineFragment = '';
+			}
 			this.end();
 		} else {
 			this._readStream.resume();
@@ -122,11 +114,11 @@ LineByLineReader.prototype._nextLine = function () {
 		this.emit('line', line);
 	}
 
-	if (!this._paused) {
-		setImmediate(function () {
+	setImmediate(function () {
+		if (!this._paused) {
 			self._nextLine();
-		});
-	}
+		}
+	});
 };
 
 LineByLineReader.prototype.pause = function () {
