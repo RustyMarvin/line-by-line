@@ -147,6 +147,7 @@ LineByLineReader.prototype.close = function () {
 
 	this._readStream.destroy();
 	this._end = true;
+	this._lines = [];
 
 	setImmediate(function () {
 		self._nextLine();
