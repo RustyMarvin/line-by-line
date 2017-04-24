@@ -8,6 +8,8 @@
  * MIT License, see LICENSE.txt, see http://www.opensource.org/licenses/mit-license.php
  */
 
+var stream = require('stream');
+var StringDecoder = require('string_decoder').StringDecoder;
 var path = require('path');
 var fs = require('fs');
 var events = require("events");
@@ -18,25 +20,31 @@ if (typeof global.setImmediate == 'undefined') { setImmediate = process.nextTick
 var LineByLineReader = function (filepath, options) {
 	var self = this;
 
-	this._filepath = path.normalize(filepath);
 	this._encoding = options && options.encoding || 'utf8';
+	if (filepath instanceof stream.Readable) {
+		this._readStream = filepath;
+	}
+	else {
+		this._readStream = null;
+		this._filepath = path.normalize(filepath);
+		this._streamOptions = { encoding: this._encoding };
+
+		if (options && options.start) {
+			this._streamOptions.start = options.start;
+		}
+
+		if (options && options.end) {
+			this._streamOptions.end = options.end;
+		}
+	}
 	this._skipEmptyLines = options && options.skipEmptyLines || false;
-	this._streamOptions = { encoding: this._encoding };
 
-	if (options && options.start) {
-		this._streamOptions.start = options.start;
-	}
-
-	if (options && options.end) {
-		this._streamOptions.end = options.end;
-	}
-
-	this._readStream = null;
 	this._lines = [];
 	this._lineFragment = '';
 	this._paused = false;
 	this._end = false;
 	this._ended = false;
+	this.decoder = new StringDecoder(this._encoding);
 
 	events.EventEmitter.call(this);
 
@@ -54,7 +62,8 @@ LineByLineReader.prototype = Object.create(events.EventEmitter.prototype, {
 
 LineByLineReader.prototype._initStream = function () {
 	var self = this,
-		readStream = fs.createReadStream(this._filepath, this._streamOptions);
+		readStream = this._readStream ? this._readStream :
+			fs.createReadStream(this._filepath, this._streamOptions);
 
 	readStream.on('error', function (err) {
 		self.emit('error', err);
@@ -66,7 +75,11 @@ LineByLineReader.prototype._initStream = function () {
 
 	readStream.on('data', function (data) {
 		self._readStream.pause();
-		self._lines = self._lines.concat(data.split(/(?:\n|\r\n|\r)/g));
+		var dataAsString = data;
+		if (data instanceof Buffer) {
+			dataAsString = self.decoder.write(data);
+		}
+		self._lines = self._lines.concat(dataAsString.split(/(?:\n|\r\n|\r)/g));
 
 		self._lines[0] = self._lineFragment + self._lines[0];
 		self._lineFragment = self._lines.pop() || '';
