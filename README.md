@@ -54,13 +54,17 @@ Asynchronous processing of lines:
 	lr.on('end', function () {
 		// All lines are read, file is closed now.
 	});
+	
+Initialize with Stream:
 
+    var LineByLineReader = require('line-by-line'),
+	    lr = new LineByLineReader(S3.getObject({ Bucket, Key }).createReadStream());
 
 ## API:
 
 **Class: LineReader(path [, options])**
 
-`path` specifies the file to read
+`path` specifies the file to read or Stream
 
 `options` is an object with the following defaults:
 ```
