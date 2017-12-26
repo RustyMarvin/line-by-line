@@ -76,7 +76,7 @@ Initialize with Stream:
 
 If `skipEmptyLines` set to `true`, empty lines don't trigger a 'line' event.
 
-You can also pass `start` and `end` position to read from file region:
+You can also pass `start` and `end` position in bytes to read from file region:
 
 ```
 { encoding: 'utf8',
