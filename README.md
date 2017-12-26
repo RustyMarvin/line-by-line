@@ -1,6 +1,7 @@
+[![Build Status](https://travis-ci.org/Osterjour/line-by-line.svg?branch=master)](https://travis-ci.org/Osterjour/line-by-line)
+[![npm version](https://badge.fury.io/js/line-by-line.svg)](http://badge.fury.io/js/line-by-line)
 
 # Line By Line
-
 is a [NodeJS](http://nodejs.org/) module
 that helps you reading large text files, line by line,
 without buffering the files into memory.
@@ -15,7 +16,7 @@ Installation:
 Synchronous processing of lines:
 
 	var LineByLineReader = require('line-by-line'),
-	var lr = new LineByLineReader('big_file.txt');
+	    lr = new LineByLineReader('big_file.txt');
 
 	lr.on('error', function (err) {
 		// 'err' contains error object
@@ -32,7 +33,7 @@ Synchronous processing of lines:
 Asynchronous processing of lines:
 
 	var LineByLineReader = require('line-by-line'),
-	var lr = new LineByLineReader('big_file.txt');
+	    lr = new LineByLineReader('big_file.txt');
 
 	lr.on('error', function (err) {
 		// 'err' contains error object
@@ -53,13 +54,17 @@ Asynchronous processing of lines:
 	lr.on('end', function () {
 		// All lines are read, file is closed now.
 	});
+	
+Initialize with Stream:
 
+    var LineByLineReader = require('line-by-line'),
+	    lr = new LineByLineReader(S3.getObject({ Bucket, Key }).createReadStream());
 
 ## API:
 
 **Class: LineReader(path [, options])**
 
-`path` specifies the file to read
+`path` specifies the file to read or Stream
 
 `options` is an object with the following defaults:
 ```
@@ -70,6 +75,14 @@ Asynchronous processing of lines:
 `encoding` can be `'utf8'`, `'ascii'`, or `'base64'`.
 
 If `skipEmptyLines` set to `true`, empty lines don't trigger a 'line' event.
+
+You can also pass `start` and `end` position in bytes to read from file region:
+
+```
+{ encoding: 'utf8',
+  skipEmptyLines: true,
+  start: 1000 }
+```
 
 
 **Event: 'line'**
@@ -110,11 +123,6 @@ After calling this method, 'line' events gets emitted again.
 **close()**
 
 Stops emitting 'line' events, closes the file and emits the 'end' event.
-
-
-## Known bugs:
-
-If the last line of a file is empty, it won't get emitted.
 
 
 ## License:

@@ -1,3 +1,4 @@
 node_modules
 .jshintrc
 _SESSION.npp
+.idea
